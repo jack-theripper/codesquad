@@ -1,21 +1,35 @@
 <?php
 
+use Phalcon\Flash\Direct as Flash;
 use Phalcon\Mvc\Dispatcher;
 use Phalcon\Mvc\Router;
 use Phalcon\Mvc\Url as UrlResolver;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
-use Phalcon\Mvc\View;
-use Phalcon\Mvc\View\Engine\Volt as VoltEngine;
-use Phalcon\Flash\Direct as Flash;
 
 /**
  * Registering a router
  */
-$di->setShared('router', function () {
-    $router = new Router();
-
-    $router->setDefaultModule('frontend');
-
+$di->setShared('router', function () use ($di, &$application) {
+    $router = new Router\Annotations();
+	$router->setDefaultModule('frontend');
+	$router->removeExtraSlashes(true);
+	
+	/**
+	 * Register routes from the module.
+	 */
+	foreach ($application->getModules() as $moduleName => $module)
+	{
+		if ( ! method_exists($module['className'], 'registerRoutes'))
+		{
+			continue;
+		}
+		
+		$definition = new $module['className']($di);
+		$definition->registerRoutes($router, $di);
+		
+		$di->setShared($module['className'], $definition); // We will not create an instance twice. Thanks Phalcon\Di
+	}
+	
     return $router;
 });
 
