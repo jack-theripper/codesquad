@@ -1,0 +1,11 @@
+{
+	"autoload": {
+		"psr-4": {
+			"Codesquad\\": "app/common/library",
+			"Codesquad\\Models\\": "app/common/models"
+		}
+	},
+	"require-dev": {
+		"phalcon/ide-stubs": "v3.4.3"
+	}
+}
