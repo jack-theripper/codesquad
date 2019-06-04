@@ -46,7 +46,7 @@ $di->setShared('modelsMetadata', function () {
 /**
  * Configure the Volt service for rendering .volt templates
  */
-$di->setShared('voltShared', function ($view) {
+$di->set('voltShared', function ($view) {
     $config = $this->getConfig();
 
     $volt = new VoltEngine($view, $this);

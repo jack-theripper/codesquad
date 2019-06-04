@@ -40,11 +40,13 @@ class Module implements ModuleDefinitionInterface
             $view = new View();
             $view->setDI($this);
             $view->setViewsDir(__DIR__ . '/views/');
-
-            $view->registerEngines([
-                '.volt'  => 'voltShared',
-                '.phtml' => PhpEngine::class
-            ]);
+	
+	        $view->registerEngines([
+		        '.volt'  => function () {
+			        return $this->get('voltShared', func_get_args());
+		        },
+		        '.phtml' => PhpEngine::class
+	        ]);
 
             return $view;
         });
