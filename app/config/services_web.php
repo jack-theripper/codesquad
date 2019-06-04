@@ -1,10 +1,15 @@
 <?php
 
+use Codesquad\Events\NotFoundPlugin;
+use Phalcon\Events\Event;
 use Phalcon\Flash\Direct as Flash;
 use Phalcon\Mvc\Dispatcher;
 use Phalcon\Mvc\Router;
 use Phalcon\Mvc\Url as UrlResolver;
 use Phalcon\Session\Adapter\Files as SessionAdapter;
+use Phalcon\Mvc\Dispatcher as MvcDispatcher;
+use Phalcon\Events\Manager as EventsManager;
+use Phalcon\Mvc\Dispatcher\Exception as DispatchException;
 
 /**
  * Registering a router
@@ -70,8 +75,13 @@ $di->set('flash', function () {
 /**
 * Set the default namespace for dispatcher
 */
-$di->setShared('dispatcher', function() {
-    $dispatcher = new Dispatcher();
-    $dispatcher->setDefaultNamespace('Codesquad\Modules\Frontend\Controllers');
-    return $dispatcher;
+$di->setShared('dispatcher', function () {
+	$events = new Phalcon\Events\Manager();
+	$events->attach('dispatch:beforeException', new NotFoundPlugin());
+	
+	$dispatcher = new Phalcon\Mvc\Dispatcher();
+	$dispatcher->setEventsManager($events);
+	$dispatcher->setDefaultNamespace('Codesquad\Modules\Frontend\Controllers');
+	
+	return $dispatcher;
 });
